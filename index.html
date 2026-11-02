@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Company Contact Entry Form</title>
+  <style>
+    :root { --ink:#172033; --muted:#657089; --line:#dfe5ef; --primary:#3157d5; --bg:#f3f6fb; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Inter,Segoe UI,Arial,sans-serif; background:linear-gradient(135deg,#eef3ff,#f7f9fc 55%,#edf8f5); color:var(--ink); min-height:100vh; padding:28px 16px; }
+    .wrap { width:min(760px,100%); margin:0 auto; }
+    .top { text-align:center; margin-bottom:22px; }
+    .logo { display:inline-grid; place-items:center; width:56px; height:56px; border-radius:18px; background:#e2eaff; color:var(--primary); font-size:27px; margin-bottom:12px; }
+    h1 { margin:0 0 8px; font-size:clamp(25px,4vw,34px); letter-spacing:-.6px; }
+    .subtitle { margin:0; color:var(--muted); line-height:1.6; }
+    .card { background:#fff; border:1px solid rgba(220,227,239,.9); border-radius:22px; padding:clamp(20px,4vw,34px); box-shadow:0 18px 50px rgba(30,50,90,.09); }
+    .section-label { display:flex; align-items:center; gap:9px; margin:0 0 22px; font-weight:700; font-size:15px; }
+    .section-label span { display:grid; place-items:center; width:30px; height:30px; border-radius:10px; background:#eef2ff; color:var(--primary); }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:19px 16px; }
+    .field { min-width:0; }
+    .field.full { grid-column:1/-1; }
+    label { display:block; font-size:13px; font-weight:700; margin-bottom:8px; color:#303b52; }
+    .required { color:#d33b4b; }
+    input, textarea { width:100%; border:1px solid var(--line); background:#fbfcfe; border-radius:11px; padding:13px 14px; font:inherit; color:var(--ink); outline:none; transition:border .15s,box-shadow .15s,background .15s; }
+    input { height:48px; }
+    textarea { min-height:115px; resize:vertical; line-height:1.5; }
+    input:focus, textarea:focus { border-color:#7d95f0; background:#fff; box-shadow:0 0 0 4px rgba(49,87,213,.1); }
+    input::placeholder, textarea::placeholder { color:#9aa4b7; }
+    .hint { color:var(--muted); font-size:12px; margin-top:7px; }
+    .actions { display:flex; align-items:center; gap:12px; margin-top:25px; }
+    button { border:0; border-radius:12px; height:49px; padding:0 21px; font:700 14px inherit; cursor:pointer; transition:transform .15s,opacity .15s; }
+    button:active { transform:scale(.98); }
+    .submit { flex:1; color:white; background:linear-gradient(100deg,#3157d5,#4b6ce2); box-shadow:0 8px 18px rgba(49,87,213,.22); font-size:14px; font-weight:700; }
+    .reset { background:#f0f3f8; color:#47536a; font-weight:700; }
+    button:disabled { opacity:.6; cursor:wait; }
+    .status { display:none; margin-top:18px; border-radius:12px; padding:13px 15px; line-height:1.5; font-size:13px; }
+    .status.show { display:block; }
+    .status.info { background:#eef4ff; color:#2345a0; border:1px solid #d5e1ff; }
+    .status.success { background:#eaf8ef; color:#17683a; border:1px solid #c7ebd3; }
+    .status.error { background:#fff0f0; color:#a32331; border:1px solid #ffd3d6; }
+    .footer { text-align:center; color:#7d879a; font-size:12px; margin-top:17px; }
+    .config-note { background:#fff9e8; color:#73551a; border:1px solid #f4e3ac; border-radius:12px; padding:13px 15px; font-size:13px; line-height:1.55; margin-bottom:18px; }
+    @media(max-width:560px) { body{padding:20px 12px} .grid{grid-template-columns:1fr;gap:16px}.field.full{grid-column:auto}.actions{flex-direction:column-reverse}.actions button{width:100%} }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="top">
+      <div class="logo" aria-hidden="true">✦</div>
+      <h1>Company Contact Form</h1>
+      <p class="subtitle">Enter company and contact details below. Submitted entries are sent to your connected Google Sheet.</p>
+    </header>
+
+    <section class="card">
+      <p class="section-label"><span>✎</span> Company Details</p>
+
+      <div id="configNote" class="config-note" hidden>
+        <strong>Setup required:</strong> Add your Google Apps Script Web App URL in the <code>WEB_APP_URL</code> setting inside this HTML file. Follow the README included with this package.
+      </div>
+
+      <form id="companyForm">
+        <div class="grid">
+          <div class="field full">
+            <label for="companyName">Company Name <span class="required">*</span></label>
+            <input id="companyName" name="companyName" type="text" placeholder="e.g. ABC Industries Pvt. Ltd." maxlength="150" required autocomplete="organization">
+          </div>
+          <div class="field full">
+            <label for="location">Location <span class="required">*</span></label>
+            <input id="location" name="location" type="text" placeholder="City, State" maxlength="200" required autocomplete="address-level2">
+          </div>
+          <div class="field">
+            <label for="contactPerson">Contact Person <span class="required">*</span></label>
+            <input id="contactPerson" name="contactPerson" type="text" placeholder="Full name" maxlength="120" required autocomplete="name">
+          </div>
+          <div class="field">
+            <label for="contactNumber">Contact Number <span class="required">*</span></label>
+            <input id="contactNumber" name="contactNumber" type="tel" placeholder="Phone number" maxlength="30" required autocomplete="tel" inputmode="tel">
+            <div class="hint">Include country code if needed, e.g. +91.</div>
+          </div>
+          <div class="field full">
+            <label for="comments">Comments</label>
+            <textarea id="comments" name="comments" placeholder="Add any follow-up notes, requirements, or remarks..." maxlength="2000"></textarea>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="reset" type="reset">Clear Form</button>
+          <button class="submit" id="submitBtn" type="submit">Submit Company Details&nbsp; →</button>
+        </div>
+      </form>
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+    </section>
+    <p class="footer">Company Contact Form · Google Sheets connected workflow</p>
+  </main>
+
+<script>
+  // STEP 1: Paste your deployed Google Apps Script Web App URL between the quotes below.
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwWLDVA9BlVBQky5uS259IdNi9AMCORdM-miIb-r2rne5g28B1Icqq9X-TGu5zu04F3/exec";
+
+  const form = document.getElementById("companyForm");
+  const submitBtn = document.getElementById("submitBtn");
+  const statusBox = document.getElementById("status");
+  const configNote = document.getElementById("configNote");
+
+  if (!WEB_APP_URL.startsWith("https://script.google.com/macros/s/AKfycbwWLDVA9BlVBQky5uS259IdNi9AMCORdM-miIb-r2rne5g28B1Icqq9X-TGu5zu04F3/exec")) {
+    configNote.hidden = false;
+  }
+
+  function showStatus(message, type) {
+    statusBox.textContent = message;
+    statusBox.className = "status show " + type;
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (!form.reportValidity()) return;
+
+    if (!WEB_APP_URL.startsWith("https://script.google.com/macros/s/AKfycbwWLDVA9BlVBQky5uS259IdNi9AMCORdM-miIb-r2rne5g28B1Icqq9X-TGu5zu04F3/exec")) {
+      showStatus("Google Sheets is not connected yet. Add the Web App URL in this HTML file, save it, and try again.", "error");
+      return;
+    }
+
+    const data = {
+      companyName: document.getElementById("companyName").value.trim(),
+      location: document.getElementById("location").value.trim(),
+      contactPerson: document.getElementById("contactPerson").value.trim(),
+      contactNumber: document.getElementById("contactNumber").value.trim(),
+      comments: document.getElementById("comments").value.trim()
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sending...";
+    showStatus("Sending your details to Google Sheets… Please wait.", "info");
+
+    try {
+      // Apps Script web apps may not expose a readable CORS response to local HTML files.
+      // no-cors sends the request, but the browser cannot confirm whether the server saved it.
+      await fetch(WEB_APP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(data)
+      });
+
+      showStatus("Request sent. Please check your Google Sheet to confirm the new row was added. If it does not appear, review the Apps Script deployment and permissions in README.", "success");
+      form.reset();
+    } catch (error) {
+      showStatus("Could not send the request. Check your internet connection and the Apps Script Web App URL, then try again.", "error");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit Company Details →";
+    }
+  });
+</script>
+</body>
+</html>
